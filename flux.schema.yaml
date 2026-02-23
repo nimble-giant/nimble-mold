@@ -9,25 +9,10 @@
   description: "Directory for saving brainstorm and analysis reports"
   default: ".claude/plans"
 
-- name: agent.targets.claude
-  type: bool
-  description: "Generate Claude Code configuration (CLAUDE.md, .claude/ commands, skills)"
-  default: "true"
-
-- name: agent.targets.copilot
-  type: bool
-  description: "Generate GitHub Copilot instructions (.github/copilot-instructions.md)"
-  default: "false"
-
-- name: agent.targets.codex
-  type: bool
-  description: "Generate OpenAI Codex configuration"
-  default: "false"
-
-- name: agent.targets.aider
-  type: bool
-  description: "Generate Aider configuration"
-  default: "false"
+- name: agent.targets
+  type: list
+  description: "AI agents to generate configuration for (claude, copilot, codex, aider)"
+  default: "[claude]"
 
 - name: agent.plan_mode.enabled
   type: bool

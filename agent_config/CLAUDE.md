@@ -1,4 +1,4 @@
-{{- if .agent.targets.claude -}}
+{{- if has "claude" .agent.targets -}}
 @agents.md
 
 # Claude-Specific Configuration
