@@ -1,4 +1,19 @@
+agent:
+  name: "the AI assistant"
+  plans_dir: ".claude/plans"
+  targets:
+    claude: true
+    copilot: false
+    codex: false
+    aider: false
+  plan_mode:
+    enter: "Enter plan mode"
+    exit: "ExitPlanMode"
+    enabled: true
 output:
+  agents: .
+  agent_config: .
+  copilot_config: .github
   commands: .claude/commands
   skills: .claude/skills
   workflows:

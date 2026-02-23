@@ -24,10 +24,14 @@ Examples:
 
 ## Workflow Overview
 
-Claude must execute this workflow when the command is invoked:
+Execute this workflow when the command is invoked:
 
 1. **Fetch PR Information**: Get PR details and all comments using {{scm.provider}} CLI
-2. **Enter Plan Mode**: Present all comments and build response strategy
+{{- if .agent.plan_mode.enabled }}
+2. **{{agent.plan_mode.enter}}**: Present all comments and build response strategy
+{{- else }}
+2. **Present all comments** and build response strategy for user review
+{{- end }}
 3. **Interactive Planning**: For each comment, ask user how to respond
 4. **Consolidate Plan**: Present final response plan for approval
 5. **Execute Plan**: Make code changes and post replies as approved
@@ -85,7 +89,11 @@ Extract for each comment:
 
 ### Step 2.1: Enter Plan Mode
 
-Claude must immediately enter plan mode and present all pending comments organized by type and priority.
+{{- if .agent.plan_mode.enabled }}
+Immediately {{agent.plan_mode.enter}} and present all pending comments organized by type and priority.
+{{- else }}
+Present all pending comments organized by type and priority for user review.
+{{- end }}
 
 ### Step 2.2: Present Comments for Planning
 
@@ -316,7 +324,7 @@ This template integrates with:
 - {{scm.provider}} CLI for PR and comment management
 - Git for code changes and commits
 - Project test suites for validation
-- Claude Code plan mode for user interaction
+- Plan mode for user interaction
 
 ## Usage Tips
 
@@ -328,4 +336,4 @@ This template integrates with:
 
 ## Recap
 
-Use this command to efficiently address all PR review comments in one session. Claude will fetch all comments, help you plan responses strategically, make necessary code changes, and post professional replies - all while keeping you in control of the process through plan mode approval.
+Use this command to efficiently address all PR review comments in one session. It fetches all comments, helps you plan responses strategically, makes necessary code changes, and posts professional replies — all while keeping you in control of the process through plan approval.

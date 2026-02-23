@@ -14,9 +14,13 @@ Open a pull request for the current branch with automatically generated descript
 
 ## Workflow
 
-When this command is used, Claude will:
+When this command is used:
 
-1. **Enter Plan Mode** to outline the PR creation/update process
+{{- if .agent.plan_mode.enabled }}
+1. **{{agent.plan_mode.enter}}** to outline the PR creation/update process
+{{- else }}
+1. **Outline the PR creation/update process** for user review
+{{- end }}
 
 2. **Check for existing PR** on the current branch using `{{pr.check}}`
 
@@ -51,6 +55,6 @@ This command integrates with:
 
 - Automatically detects existing PRs to avoid duplicates
 - Uses {{scm.provider}} CLI (`{{scm.cli}}`) for all PR operations
-- Puts Claude into Plan Mode for transparency
+- Enters plan mode for transparency
 - Leverages existing `/pr-description` functionality
-- Does not include Claude Code attribution in PR descriptions
+- Does not include AI attribution in PR descriptions
