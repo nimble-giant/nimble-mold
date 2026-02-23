@@ -41,7 +41,7 @@ Most teams bolt AI onto their workflow as an afterthought. nimble-mold treats AI
 
 ```bash
 # Cast the mold into your project
-ailloy cast nimble-giant/nimble-mold
+ailloy cast github.com/nimble-giant/nimble-mold
 ```
 
 This renders and installs:
@@ -108,7 +108,7 @@ nimble-mold is configurable through ailloy's standard flux system. Override defa
 
 ```bash
 # Cast with custom project board settings
-ailloy cast nimble-giant/nimble-mold \
+ailloy cast github.com/nimble-giant/nimble-mold \
   --set project.organization=your-org \
   --set project.board=your-board
 ```
