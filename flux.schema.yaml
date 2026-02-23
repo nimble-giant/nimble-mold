@@ -1,3 +1,49 @@
+# --- Agent Configuration ---
+- name: agent.name
+  type: string
+  description: "Human-readable name for the AI assistant in generated instructions"
+  default: "the AI assistant"
+
+- name: agent.plans_dir
+  type: string
+  description: "Directory for saving brainstorm and analysis reports"
+  default: ".claude/plans"
+
+- name: agent.targets.claude
+  type: bool
+  description: "Generate Claude Code configuration (CLAUDE.md, .claude/ commands, skills)"
+  default: "true"
+
+- name: agent.targets.copilot
+  type: bool
+  description: "Generate GitHub Copilot instructions (.github/copilot-instructions.md)"
+  default: "false"
+
+- name: agent.targets.codex
+  type: bool
+  description: "Generate OpenAI Codex configuration"
+  default: "false"
+
+- name: agent.targets.aider
+  type: bool
+  description: "Generate Aider configuration"
+  default: "false"
+
+- name: agent.plan_mode.enabled
+  type: bool
+  description: "Whether the target agent supports explicit plan/analysis mode"
+  default: "true"
+
+- name: agent.plan_mode.enter
+  type: string
+  description: "Instruction text for entering plan/analysis mode"
+  default: "Enter plan mode"
+
+- name: agent.plan_mode.exit
+  type: string
+  description: "Tool or instruction for exiting plan mode"
+  default: "ExitPlanMode"
+
 # --- Project Configuration ---
 - name: project.organization
   type: string

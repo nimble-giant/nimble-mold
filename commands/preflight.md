@@ -5,19 +5,27 @@ Run pre-flight planning for a new task or mini-sprint.
 ## Usage
 
 ```
-claude preflight
-claude preflight <issue-number>
+/preflight
+/preflight <issue-number>
 ```
 
 ## Description
 
 Executes the Pre-Flight Planning ceremony to ensure proper understanding and alignment before starting implementation.
 
-**Important:** When this command is invoked, Claude should immediately switch to plan mode to properly analyze and plan the task before any implementation begins.
+{{- if .agent.plan_mode.enabled }}
+**Important:** When this command is invoked, immediately {{agent.plan_mode.enter}} to properly analyze and plan the task before any implementation begins.
 
 ## Steps
 
-**First:** Enter plan mode to properly analyze the task. This ensures thoughtful planning before implementation.
+**First:** {{agent.plan_mode.enter}} to properly analyze the task. This ensures thoughtful planning before implementation.
+{{- else }}
+**Important:** When this command is invoked, analyze and plan the task before any implementation begins. Present the analysis for user review.
+
+## Steps
+
+**First:** Analyze the task thoroughly. This ensures thoughtful planning before implementation.
+{{- end }}
 
 1. **Read & Clarify**
    - Read the issue aloud
@@ -84,4 +92,8 @@ Ready for go/no-go decision.
 
 ## Plan Mode Note
 
-After completing the pre-flight analysis and receiving user approval, use the `exit_plan_mode` tool to transition to implementation. This ensures a clear separation between planning and execution phases.
+{{- if .agent.plan_mode.enabled }}
+After completing the pre-flight analysis and receiving user approval, use `{{agent.plan_mode.exit}}` to transition to implementation. This ensures a clear separation between planning and execution phases.
+{{- else }}
+After completing the pre-flight analysis and receiving user approval, transition to implementation. This ensures a clear separation between planning and execution phases.
+{{- end }}

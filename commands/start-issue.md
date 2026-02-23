@@ -16,7 +16,7 @@ Fetch a {{scm.provider}} issue and begin implementation.
 
 ## Workflow
 
-When this command is used, Claude will:
+When this command is used:
 
 1. **Fetch the issue details** using `{{issue.view}}`
 
