@@ -5,7 +5,7 @@ Generate a pull request description for the current branch changes.
 ## Usage
 
 ```
-claude pr-description
+/pr-description
 ```
 
 ## Title
@@ -16,7 +16,7 @@ The title of the pr should adhere to our git conventional commit guidelines to m
 
 This command generates a comprehensive PR description by comparing the current branch to the head of `main` using `git diff main...`. The PR description is saved as a markdown file in the `/pr-descriptions` folder.
 
-If the `/gh-issue` command was used and Claude knows what {{scm.provider}} issue the branch is for, the PR description should begin with `closes #<github-issue-number>`.
+If the `/gh-issue` command was used and the {{scm.provider}} issue for the branch is known, the PR description should begin with `closes #<github-issue-number>`.
 
 ## Output
 
@@ -64,6 +64,6 @@ This PR adds support for Control Families in the Judge web UI, allowing users to
 
 ## Notes
 
-- Only generate when explicitly requested with `claude pr-description`, `/pr-description`, or when directly asked to "create a PR description"
+- Only generate when explicitly requested with `/pr-description` or when directly asked to "create a PR description"
 - Always compare current branch to main branch for complete context
-- Do not include Claude Code attribution or generated-by notices in PR descriptions
+- Do not include AI attribution or generated-by notices in PR descriptions

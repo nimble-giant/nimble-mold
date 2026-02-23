@@ -27,21 +27,24 @@ This command takes a raw idea or prompt and systematically dissects it using str
 
 ## Workflow
 
-When this command is invoked, Claude must:
+When this command is invoked:
 
-1. **Enter Plan Mode** immediately
+{{- if .agent.plan_mode.enabled }}
+1. **{{agent.plan_mode.enter}}** immediately
 2. Execute all brainstorming phases below against the user's idea
-3. Present the complete brainstorm analysis as the plan using `ExitPlanMode`
+3. Present the complete brainstorm analysis as the plan using `{{agent.plan_mode.exit}}`
 4. Wait for user approval
 5. After approval, save the brainstorm report and stop. Do **not** begin implementation. The user decides if and when to act on the findings separately
+{{- else }}
+1. Execute all brainstorming phases below against the user's idea
+2. Present the complete brainstorm analysis for user review
+3. Wait for user approval
+4. After approval, save the brainstorm report and stop. Do **not** begin implementation. The user decides if and when to act on the findings separately
+{{- end }}
 
 ### Report Save Location
 
-Save the final report to:
-- `.claude/plans/` if a `.claude/` directory exists in the project root
-- `~/.claude/plans/` otherwise
-
-Create the `plans/` subdirectory if it does not exist.
+Save the final report to `{{agent.plans_dir}}`. Create the directory if it does not exist.
 
 ### Report File Naming
 
@@ -56,7 +59,7 @@ Examples:
 
 ## Brainstorming Methodology
 
-Claude must work through the following phases in order. Each phase builds on the previous one. The methodology draws from UNC's brainstorming framework, adapted for evaluating software and product ideas.
+Work through the following phases in order. Each phase builds on the previous one. The methodology draws from UNC's brainstorming framework, adapted for evaluating software and product ideas.
 
 ### Phase 1: Freewriting — Unpack the Idea
 
@@ -167,7 +170,11 @@ Do not soften a negative verdict. A clear "this won't work because X" is more va
 
 ## Plan Mode Output Format
 
-The plan presented via `ExitPlanMode` must follow this exact structure:
+{{- if .agent.plan_mode.enabled }}
+The plan presented via `{{agent.plan_mode.exit}}` must follow this exact structure:
+{{- else }}
+The analysis presented for review must follow this exact structure:
+{{- end }}
 
 ```markdown
 # Brainstorm: {short title derived from the idea}
@@ -244,7 +251,7 @@ The plan presented via `ExitPlanMode` must follow this exact structure:
 
 ## Research Requirements
 
-Before producing the brainstorm, Claude should gather relevant context:
+Before producing the brainstorm, gather relevant context:
 
 - **Codebase context**: If the idea relates to the current project, explore the relevant code, architecture, and existing patterns
 - **Web research**: Search for prior art, existing tools, competing solutions, and relevant technical concepts
@@ -256,7 +263,11 @@ Do not fabricate comparisons or claim prior art exists without verifying. If you
 
 ## Rules
 
+{{- if .agent.plan_mode.enabled }}
 - Always enter plan mode. The brainstorm output IS the plan.
+{{- else }}
+- Always present the brainstorm analysis for review before saving.
+{{- end }}
 - Do not skip phases. Every phase must appear in the output, even if brief.
 - Be direct. Avoid hedge words like "potentially," "might," "could possibly." State what you think.
 - Be honest. If the idea is bad, say so in the verdict. Do not pad a weak idea with false encouragement.

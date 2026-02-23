@@ -10,9 +10,13 @@ Update the description of an existing pull request for the current branch.
 
 ## Workflow
 
-When this command is used, Claude will:
+When this command is used:
 
-1. **Enter Plan Mode** to outline the PR update process
+{{- if .agent.plan_mode.enabled }}
+1. **{{agent.plan_mode.enter}}** to outline the PR update process
+{{- else }}
+1. **Outline the PR update process** for user review
+{{- end }}
 
 2. **Verify PR exists** for the current branch using `{{pr.check}}`
 
@@ -42,6 +46,6 @@ This command integrates with:
 
 - Assumes PR already exists for the current branch
 - Regenerates entire description from scratch for accuracy
-- Puts Claude into Plan Mode for transparency
+- Enters plan mode for transparency
 - Uses same description format as `/pr-description` command
-- Does not include Claude Code attribution in updated PR descriptions
+- Does not include AI attribution in updated PR descriptions

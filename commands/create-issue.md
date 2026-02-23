@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This command is used to instruct Claude to generate {{scm.provider}} issues with a clean, actionable, well-structured format. It is optimized for creating consistent {{scm.provider}} issues for engineering planning, with consistent formatting across `feat`, `fix`, `chore`, `docs`, and `epic` types.
+This command generates {{scm.provider}} issues with a clean, actionable, well-structured format. It is optimized for creating consistent {{scm.provider}} issues for engineering planning, with consistent formatting across `feat`, `fix`, `chore`, `docs`, and `epic` types.
 
 ## Command Name
 
@@ -41,21 +41,30 @@ You can invoke this command with optional flags:
 /create-github-issue --prompt feat(web): new feature requiring custom setup
 ```
 
-Claude must:
-
-1. Immediately enter plan mode when this command is invoked
+{{- if .agent.plan_mode.enabled }}
+1. Immediately {{agent.plan_mode.enter}} when this command is invoked
 2. Parse the user input to extract flags and issue description
 3. Format the {{scm.provider}} issue using the exact markdown structure below
-4. Use the ExitPlanMode tool to present the formatted issue as the plan
+4. Use {{agent.plan_mode.exit}} to present the formatted issue as the plan
 5. Wait for user approval before proceeding
 6. After approval:
    - If `--prompt` flag is present: Use interactive mode (ask for board and labels if repository supports them)
    - Otherwise: Use parsed flags only (no prompting, no automatic assignments)
 7. Execute the {{scm.provider}} CLI commands to create the issue with configured settings
+{{- else }}
+1. Parse the user input to extract flags and issue description
+2. Format the {{scm.provider}} issue using the exact markdown structure below
+3. Present the formatted issue for user review
+4. Wait for user approval before proceeding
+5. After approval:
+   - If `--prompt` flag is present: Use interactive mode (ask for board and labels if repository supports them)
+   - Otherwise: Use parsed flags only (no prompting, no automatic assignments)
+6. Execute the {{scm.provider}} CLI commands to create the issue with configured settings
+{{- end }}
 
 ## Plan Mode Output Format
 
-In plan mode, Claude must present the issue using this exact structure:
+Present the issue using this exact structure:
 
 ```markdown
 # {type(scope): short description in lowercase}
@@ -154,7 +163,11 @@ We hit our ECR scan limits in sandbox, which blocked scan visibility before a re
    - Extract issue description from remaining input
    - Note: No defaults are applied - only use explicitly provided flags
 2. **Format Issue**: Create {{scm.provider}} issue using the exact markdown format above
-3. **Present Plan**: Use `ExitPlanMode` tool with the formatted issue as the plan, including parsed settings
+{{- if .agent.plan_mode.enabled }}
+3. **Present Plan**: Use `{{agent.plan_mode.exit}}` with the formatted issue as the plan, including parsed settings
+{{- else }}
+3. **Present Plan**: Present the formatted issue for user review, including parsed settings
+{{- end }}
 4. **Wait for Approval**: Do not proceed until user explicitly approves
 
 ### Phase 2: Issue Creation
@@ -307,7 +320,7 @@ mutation {
 
 ## Default Behaviors
 
-When no flags are specified, Claude will:
+When no flags are specified:
 
 - Create a basic {{scm.provider}} issue with title and description only
 - Not add to any project board
@@ -318,7 +331,7 @@ This ensures a streamlined experience where issues are created immediately after
 
 ## Interactive Mode (--prompt)
 
-When the `--prompt` flag is used, Claude will:
+When the `--prompt` flag is used:
 
 - Ask if you want to add the issue to a project board
 - Ask if you want to add any labels to the issue

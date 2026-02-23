@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: mold
 name: ailloy-defaults
-version: 0.1.10
-description: "Default Claude Code commands, skills, and workflows for AI-assisted development"
+version: 0.2.0
+description: "Agent-agnostic AI development commands, skills, and workflows using the AGENTS.md standard"
 author:
   name: Nimble Giant
   url: https://github.com/nimble-giant/ailloy
