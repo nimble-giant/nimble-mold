@@ -1,4 +1,4 @@
-{{- if .agent.targets.copilot -}}
+{{- if has "copilot" .agent.targets -}}
 # Copilot Instructions
 
 Refer to `agents.md` in the project root for complete development methodology and conventions.

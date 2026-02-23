@@ -52,12 +52,11 @@ ailloy cast github.com/nimble-giant/nimble-mold
 
 # Claude + Copilot
 ailloy cast github.com/nimble-giant/nimble-mold \
-  --set agent.targets.copilot=true
+  --set agent.targets="[claude,copilot]"
 
 # Copilot only (no Claude)
 ailloy cast github.com/nimble-giant/nimble-mold \
-  --set agent.targets.claude=false \
-  --set agent.targets.copilot=true
+  --set agent.targets="[copilot]"
 ```
 
 This renders and installs:
@@ -65,10 +64,10 @@ This renders and installs:
 | Artifact | Destination | When |
 |----------|-------------|------|
 | `agents.md` | Project root | Always |
-| `CLAUDE.md` | Project root | `agent.targets.claude=true` (default) |
-| Commands | `.claude/commands/` | `agent.targets.claude=true` (default) |
-| Skills | `.claude/skills/` | `agent.targets.claude=true` (default) |
-| `copilot-instructions.md` | `.github/` | `agent.targets.copilot=true` |
+| `CLAUDE.md` | Project root | `claude` in `agent.targets` (default) |
+| Commands | `.claude/commands/` | `claude` in `agent.targets` (default) |
+| Skills | `.claude/skills/` | `claude` in `agent.targets` (default) |
+| `copilot-instructions.md` | `.github/` | `copilot` in `agent.targets` |
 | Workflows | `.github/workflows/` | Always (Claude-specific) |
 
 That's it. Start using the commands immediately.
@@ -99,7 +98,7 @@ Every command is a structured instruction that guides AI behavior through well-d
 | `/pr-description` | Generates a comprehensive PR description by diffing the current branch against `main`. Saves to `/pr-descriptions/` for review before submission. |
 | `/pr-review` | Conducts a full code review. Silent mode (default) outputs a markdown report. Interactive mode posts inline comments to the PR after plan approval. Supports focused reviews: security, performance, testing, or architecture. |
 | `/pr-comments` | Fetches all PR review comments, plans strategic responses, makes code changes, and posts replies — all in one pass. |
-| `/init-ailloy-claude-md` | Generates a `CLAUDE.md` in the project root with `@agents.md` at the top. Use this when targeting Claude Code to create the Claude-specific config file on demand. |
+| `/init-agents-md` | Researches your project and generates a holistic `AGENTS.md` file. Sources from existing `CLAUDE.md` if present, links to sub-files if content exceeds 150 lines, and optionally replaces `CLAUDE.md` with a `@AGENTS.md` reference. |
 
 ## Skills
 
@@ -140,14 +139,14 @@ nimble-mold is configurable through ailloy's standard flux system. Override defa
 ailloy cast github.com/nimble-giant/nimble-mold \
   --set project.organization=your-org \
   --set project.board=your-board \
-  --set agent.targets.copilot=true
+  --set agent.targets="[claude,copilot]"
 ```
 
 ### Configurable surfaces
 
 | Area | What you can tune |
 |------|-------------------|
-| **Agent Targets** | Which AI agents to generate config for (Claude, Copilot, Codex, Aider) |
+| **Agent Targets** | Array of AI agents to generate config for: `claude`, `copilot`, `codex`, `aider` |
 | **Agent Settings** | Plan mode behavior, report save location, agent name |
 | **Project Board** | Organization, board name, project ID |
 | **Ore Fields** | Status, priority, and iteration field mappings for GitHub Projects |
@@ -166,13 +165,13 @@ nimble-mold/
 ├── agents/                        # Agent-agnostic instructions (AGENTS.md standard)
 │   └── agents.md
 ├── agent_config/                  # Agent-specific root config files
-│   └── CLAUDE.md                  #   Conditional: agent.targets.claude
+│   └── CLAUDE.md                  #   Conditional: "claude" in agent.targets
 ├── copilot_config/                # Copilot-specific config
-│   └── copilot-instructions.md    #   Conditional: agent.targets.copilot
+│   └── copilot-instructions.md    #   Conditional: "copilot" in agent.targets
 ├── commands/                      # AI agent commands
 │   ├── brainstorm.md
 │   ├── create-issue.md
-│   ├── init-ailloy-claude-md.md
+│   ├── init-agents-md.md
 │   ├── open-pr.md
 │   ├── pr-comments.md
 │   ├── pr-description.md
@@ -207,10 +206,10 @@ nimble-mold/
 
 | Agent | Required when |
 |-------|--------------|
-| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `agent.targets.claude=true` (default) |
-| [GitHub Copilot](https://github.com/features/copilot) | `agent.targets.copilot=true` |
-| [OpenAI Codex](https://openai.com/codex) | `agent.targets.codex=true` |
-| [Aider](https://aider.chat) | `agent.targets.aider=true` |
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `claude` in `agent.targets` (default) |
+| [GitHub Copilot](https://github.com/features/copilot) | `copilot` in `agent.targets` |
+| [OpenAI Codex](https://openai.com/codex) | `codex` in `agent.targets` |
+| [Aider](https://aider.chat) | `aider` in `agent.targets` |
 
 ## License
 

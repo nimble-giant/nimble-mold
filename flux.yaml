@@ -2,10 +2,7 @@ agent:
   name: "the AI assistant"
   plans_dir: ".claude/plans"
   targets:
-    claude: true
-    copilot: false
-    codex: false
-    aider: false
+    - claude
   plan_mode:
     enter: "Enter plan mode"
     exit: "ExitPlanMode"
