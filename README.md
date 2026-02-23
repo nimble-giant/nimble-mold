@@ -48,14 +48,14 @@ Most teams bolt AI onto their workflow as an afterthought. nimble-mold treats AI
 
 ```bash
 # Default: generates agents.md + Claude Code config
-ailloy cast nimble-giant/nimble-mold
+ailloy cast github.com/nimble-giant/nimble-mold
 
 # Claude + Copilot
-ailloy cast nimble-giant/nimble-mold \
+ailloy cast github.com/nimble-giant/nimble-mold \
   --set agent.targets.copilot=true
 
 # Copilot only (no Claude)
-ailloy cast nimble-giant/nimble-mold \
+ailloy cast github.com/nimble-giant/nimble-mold \
   --set agent.targets.claude=false \
   --set agent.targets.copilot=true
 ```
@@ -137,7 +137,7 @@ nimble-mold is configurable through ailloy's standard flux system. Override defa
 
 ```bash
 # Cast with custom settings
-ailloy cast nimble-giant/nimble-mold \
+ailloy cast github.com/nimble-giant/nimble-mold \
   --set project.organization=your-org \
   --set project.board=your-board \
   --set agent.targets.copilot=true
