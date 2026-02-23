@@ -19,9 +19,13 @@ Use this skill whenever the user wants to brainstorm, evaluate, or pressure-test
 
 Follow these steps in order:
 
-### Step 1: Enter Plan Mode
+### Step 1: Begin Analysis
 
-Enter plan mode immediately. The brainstorm output IS the plan.
+{{- if .agent.plan_mode.enabled }}
+{{agent.plan_mode.enter}} immediately. The brainstorm output IS the plan.
+{{- else }}
+Begin the structured analysis. The brainstorm output will be presented for user review.
+{{- end }}
 
 ### Step 2: Research
 
@@ -115,7 +119,11 @@ Do not soften a negative verdict.
 
 ### Step 4: Present the Plan
 
-Present the complete brainstorm analysis via `ExitPlanMode` using this structure:
+{{- if .agent.plan_mode.enabled }}
+Present the complete brainstorm analysis via `{{agent.plan_mode.exit}}` using this structure:
+{{- else }}
+Present the complete brainstorm analysis for user review using this structure:
+{{- end }}
 
 ```markdown
 # Brainstorm: {short title derived from the idea}
@@ -190,11 +198,7 @@ Present the complete brainstorm analysis via `ExitPlanMode` using this structure
 
 ### Step 5: Save the Report and Stop
 
-After user approval, save the brainstorm report to:
-- `.claude/plans/` if a `.claude/` directory exists in the project root
-- `~/.claude/plans/` otherwise
-
-Create the `plans/` subdirectory if it does not exist.
+After user approval, save the brainstorm report to `{{agent.plans_dir}}`. Create the directory if it does not exist.
 
 Name the file `brainstorm-{slug}.md` where `{slug}` is a kebab-case summary of the idea (3-5 words max).
 
@@ -202,7 +206,11 @@ Name the file `brainstorm-{slug}.md` where `{slug}` is a kebab-case summary of t
 
 ## Rules
 
+{{- if .agent.plan_mode.enabled }}
 - Always enter plan mode. The brainstorm output IS the plan.
+{{- else }}
+- Always present the brainstorm analysis for review before saving.
+{{- end }}
 - Do not skip phases. Every phase must appear in the output.
 - Be direct. Avoid hedge words like "potentially," "might," "could possibly."
 - Be honest. If the idea is bad, say so in the verdict.
