@@ -48,7 +48,7 @@ This renders and installs:
 
 | Artifact | Destination | Description |
 |----------|-------------|-------------|
-| Commands | `.claude/commands/` | 9 Claude Code slash commands |
+| Commands | `.claude/commands/` | 10 Claude Code slash commands |
 | Skills | `.claude/skills/` | Auto-triggered Claude Code skills |
 | Workflows | `.github/workflows/` | GitHub Actions for CI-driven AI |
 
@@ -60,6 +60,7 @@ Every command is a structured Claude Code instruction that guides AI behavior th
 
 | Command | What it does |
 |---------|-------------|
+| `/architect [--adr] <goal>` | 6-phase structured system design. Discovers codebase context, identifies gaps, then works through requirements, components, data, interfaces, cross-cutting concerns, and tradeoff analysis. Optionally generates ADR files. Saves a design document — never generates code. |
 | `/brainstorm <idea>` | 7-phase structured analysis of any idea. Freewriting, cubing, journalistic questions, feasibility assessment, hypothesis extraction, solution proposals, and a direct go/no-go verdict. Saves a report — never generates code. |
 | `/preflight` | Pre-flight planning ceremony. Evaluates work against INVEST criteria, generates BDD acceptance specs (Given/When/Then), sketches architecture, and presents a go/no-go decision before any code is written. |
 | `/start-issue <number>` | Fetches a GitHub issue and begins focused implementation. Builds a task list from requirements and stays scoped to that single issue. |
@@ -77,6 +78,7 @@ Skills are auto-triggered capabilities that activate based on natural language c
 | Skill | Triggers on |
 |-------|------------|
 | **Brainstorm** | "brainstorm X", "is this idea worth building?", "help me think through this", "evaluate this concept" |
+| **System Design** | "design the architecture for X", "how should we structure this?", "help me think through the technical design", "plan the system design" |
 
 Skills run the same structured methodology as their command counterparts but activate conversationally — no slash prefix needed.
 
@@ -132,6 +134,7 @@ nimble-mold/
 ├── flux.yaml              # Configuration defaults & API templates
 ├── flux.schema.yaml       # Configuration schema with auto-discovery
 ├── commands/              # Claude Code slash commands
+│   ├── architect.md
 │   ├── brainstorm.md
 │   ├── create-issue.md
 │   ├── open-pr.md
@@ -142,7 +145,8 @@ nimble-mold/
 │   ├── start-issue.md
 │   └── update-pr.md
 ├── skills/                # Auto-triggered Claude Code skills
-│   └── brainstorm.md
+│   ├── brainstorm.md
+│   └── system-design.md
 ├── workflows/             # GitHub Actions workflow templates
 │   ├── claude-code.yml
 │   └── claude-code-review.yml
