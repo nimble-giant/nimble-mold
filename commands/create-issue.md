@@ -21,6 +21,7 @@ You can invoke this command with optional flags:
 - `-b, --board <name>`: Specify project board (default: "{{project.board}}")
 - `-l, --label <label>`: Add labels to the issue (can be used multiple times)
 - `--prompt`: Enable interactive mode (prompts for board and labels if supported)
+- `--local`: Save the issue as a local markdown file in the `plans/` directory instead of creating a {{scm.provider}} issue
 
 ### Examples
 
@@ -31,7 +32,7 @@ You can invoke this command with optional flags:
 # With project board
 /create-github-issue --board "Tech Debt" fix(api): memory leak in cache
 
-# With labels 
+# With labels
 /create-github-issue -l bug -l priority:high fix(security): patch vulnerability
 
 # Multiple labels and board
@@ -39,6 +40,9 @@ You can invoke this command with optional flags:
 
 # Interactive mode for teams with complex configurations
 /create-github-issue --prompt feat(web): new feature requiring custom setup
+
+# Save locally as a markdown file in plans/ (private, no GitHub issue created)
+/create-github-issue --local feat(web): new feature to plan privately
 ```
 
 Claude must:
@@ -181,6 +185,19 @@ If `--prompt` flag is detected:
 3. **Create Issue**: Same as Mode A but with user-provided values
 4. **Add Board/Labels**: Apply user-specified board and labels
 
+#### Mode C: Local Mode (--local flag)
+
+If `--local` flag is detected:
+
+1. **Derive filename** from the issue title:
+   - Take the title line (e.g. `feat(web): add control family status card`)
+   - Convert to lowercase kebab-case, stripping punctuation: `feat-web-add-control-family-status-card`
+   - Append `.md` extension
+2. **Ensure `plans/` directory exists**: Create it if not present (`mkdir -p plans`)
+3. **Write the file**: Save the full formatted plan (title + body) to `plans/<filename>.md`
+4. **Confirm**: Report the saved file path to the user (e.g. `plans/feat-web-add-control-family-status-card.md`)
+5. **Do NOT** run any `{{scm.cli}}` commands — no {{scm.provider}} issue is created
+
 ## {{scm.provider}} CLI Commands
 
 ### Basic Issue Creation
@@ -304,6 +321,7 @@ mutation {
 - Long flags require equals or space: `--board="My Board"` or `--board "My Board"`
 - Flags must come before the issue description
 - Unknown flags are treated as part of the description
+- `--local` is mutually exclusive with `--board`, `--label`, and `--prompt` (local mode does not interact with {{scm.provider}})
 
 ## Default Behaviors
 
@@ -326,6 +344,17 @@ When the `--prompt` flag is used, Claude will:
 
 This provides flexibility for users who prefer to configure settings interactively or are unsure about their repository's configuration.
 
+## Local Mode (--local)
+
+When the `--local` flag is used, Claude will:
+
+- Save the formatted issue as a markdown file in the `plans/` directory
+- Derive the filename from the issue title in kebab-case (e.g. `plans/feat-web-add-new-feature.md`)
+- Create the `plans/` directory if it does not exist
+- Skip all {{scm.provider}} CLI commands — nothing is published or shared
+
+This is useful for keeping early-stage planning private or for drafting issues before deciding to publish them. The saved files are compatible with `/start-issue --local` for beginning implementation directly from a local plan.
+
 ## Error Handling
 
 - If `{{scm.cli}}` command fails, report the error and suggest checking {{scm.provider}} CLI authentication
@@ -340,5 +369,6 @@ Use this command for creating {{scm.provider}} issues efficiently:
 - **Default mode**: Issues are created immediately after plan approval with sensible defaults
 - **Flag overrides**: Use flags when you need specific values (e.g., `-b "Tech Debt" -p P0`)
 - **Interactive mode**: Use `--prompt` flag when you need full control or are unsure of settings
+- **Local mode**: Use `--local` flag to save the plan as a private markdown file in `plans/` without creating a {{scm.provider}} issue
 
 The command balances automation with flexibility, defaulting to streamlined execution while allowing interactive configuration when needed.
