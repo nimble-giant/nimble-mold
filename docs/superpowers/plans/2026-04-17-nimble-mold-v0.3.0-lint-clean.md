@@ -14,6 +14,95 @@
 
 ---
 
+## Agentskills spec notes (filled in Task 1)
+
+Source: <https://agentskills.io/specification> (fetched 2026-04-17). These findings drive frontmatter and import decisions in Tasks 2-16. Do not invent fields beyond what's listed here.
+
+### Frontmatter fields
+
+| Field | Required | Notes |
+| --- | --- | --- |
+| `name` | Yes | 1-64 chars, lowercase `a-z`/digits/hyphens, no leading/trailing hyphen, no consecutive hyphens, **must match parent directory name**. |
+| `description` | Yes | 1-1024 chars, non-empty. Should describe **what** the skill does and **when** to use it; include keywords. |
+| `license` | No | License name or reference to a bundled `LICENSE` file. |
+| `compatibility` | No | Max 500 chars. Only include if the skill has specific env requirements (e.g., `Requires git, docker, jq, and access to the internet`). Most skills omit. |
+| `metadata` | No | Arbitrary string-to-string map for client-specific extensions. Recommend namespaced keys (e.g., `author`, `version`). |
+| `allowed-tools` | No | **Experimental.** Space-separated string of pre-approved tools, e.g., `allowed-tools: Bash(git:*) Bash(jq:*) Read`. Support varies across agents. |
+
+**Not in the spec:** there is **no** `model` field defined in the agentskills.io specification. The plan text in the "SKILL.md frontmatter convention" section below mentions `model` as a possibility — it is **not** part of agentskills. Do not emit a top-level `model:` key in SKILL.md frontmatter. If a client-specific model preference is required, put it under `metadata:` with a namespaced key.
+
+**This plan will use:** `name` and `description` on every SKILL.md (minimum). `allowed-tools` MAY be added per-skill where a narrow tool scope clearly helps (treat as optional polish, not required). No `license`, `compatibility`, or `metadata` unless a downstream task has a concrete reason.
+
+### Body and file organization
+
+- No format restrictions on the Markdown body; keep `SKILL.md` under **500 lines** and under **~5000 tokens**.
+- Optional subdirectories: `scripts/` (executable code), `references/` (extra docs loaded on demand), `assets/` (templates, images, data).
+- Keep file references **one level deep** from `SKILL.md`. Avoid deeply nested reference chains.
+
+### File-reference / import syntax
+
+The agentskills spec's "File references" section shows standard Markdown relative paths from the skill root:
+
+```markdown
+See [the reference guide](references/REFERENCE.md) for details.
+
+Run the extraction script:
+scripts/extract.py
+```
+
+The `@path/to/file.md` inline-import syntax is **not** part of the agentskills.io spec itself — it's a Claude Code / ailloy convention (and appears in ailloy's `duplicate-topics` lint hint: *"reference it with @path/to/file.md in each instruction file"*). Both forms will be used in this plan: `@references/<name>.md` for progressive-disclosure imports that inline content, and standard Markdown links for informational cross-references.
+
+Path semantics (as practiced by Claude Code today, not the agentskills spec): `@` paths are resolved **relative to the file that contains them**. The spec says nothing about cross-skill shared directories, `_shared/`, or parent-directory traversal (`..`). Treat cross-skill imports as unsupported-by-spec territory.
+
+### Cross-skill shared content support
+
+**Unclear / unsupported by the spec.** The agentskills.io specification makes **no mention** of a `skills/_shared/` directory, a shared-fragment convention, or cross-skill file imports. The spec explicitly recommends keeping references "one level deep from `SKILL.md`". Anything like `@../_shared/get-current-branch.md` would be (a) outside what the spec describes, and (b) brittle — its resolution depends on the runtime's `@`-import resolver, not the spec.
+
+### Chosen shared-fragment approach for Task 13
+
+**Option B (fallback): per-skill `references/get-current-branch.md` duplicate.**
+
+Rationale:
+
+1. The agentskills spec does not describe cross-skill shared files; Option A (`skills/_shared/`) is not spec-sanctioned and its cross-skill `@`-import resolution is unverified in the current ailloy runtime.
+2. The ailloy `duplicate-topics` lint is content-similarity-based; a `.ailloyrc.yaml` suppression entry with a clear rationale is the exact mechanism ailloy offers for intentional duplication.
+3. Keeping each skill self-contained aligns with the spec's "one level deep" guidance and with progressive-disclosure: each skill ships a tight `references/` tree that agents load only when the skill is active, with no dependency on a neighbor skill's layout.
+
+Implementation shape for Task 13:
+
+- Create `skills/pr-review/references/get-current-branch.md` and `skills/pr-comments/references/get-current-branch.md` as byte-identical copies, each with a leading HTML-comment noting the canonical source (pick one, e.g., `skills/pr-review/references/get-current-branch.md`, as canonical).
+- Add a `.ailloyrc.yaml` entry suppressing `duplicate-topics` **only** for the heading `"get current branch"` across those two files, with a comment pointing at this section of the plan for rationale.
+- If a future ailloy release introduces a first-class shared-fragment mechanism (a `skills/_shared/` convention or a spec-level cross-skill import), a follow-up task can collapse the duplicate and remove the suppression.
+
+### Baseline assay result (Step 1 verification)
+
+Clean baseline captured against `main` (pre-docs commits): **0 errors, 16 warnings, 0 suggestions** — matches the plan's expectation exactly. Breakdown (from `/tmp/nimble-mold-baseline-assay.txt`):
+
+- 10 × `commands-deprecated` — `brainstorm`, `create-issue`, `init-agents-md`, `open-pr`, `pr-comments`, `pr-description`, `pr-review`, `preflight`, `start-issue`, `update-pr`.
+- 4 × `line-count` — `brainstorm.md` 263, `create-issue.md` 297, `pr-comments.md` 334, `pr-review.md` 530 (threshold 150).
+- 1 × `empty-file` — `.github/copilot-instructions.md` (because the `{{- if has "copilot" .agent.targets -}}` wrapper renders empty under the default `agent.targets: [claude]`).
+- 1 × `duplicate-topics` — heading `"get current branch"` duplicated in `.claude/commands/pr-comments.md` and `.claude/commands/pr-review.md`.
+
+ailloy version confirmed: `v0.6.13-7-g3d2f29c` (matches the minimum required by this plan).
+
+### Heads-up for later tasks (side finding, not blocking Task 1)
+
+`ailloy temper --assay .` on the current `ailloy-assay-refactor` branch fails with **2 template errors** (not warnings) because `temper` parses **every** `.md` file in the mold directory as a Go template, including the plan and spec markdown files under `docs/`. Both files embed Go-template syntax inside fenced code blocks (`{{- if has \"<target>\" .agent.targets -}}`), and the backslash-escaped quote breaks Go's template parser.
+
+- `docs/superpowers/plans/2026-04-17-nimble-mold-v0.3.0-lint-clean.md:120` (inside a ` ```bash ` code fence)
+- `docs/superpowers/specs/2026-04-17-nimble-mold-v0.3.0-lint-clean-design.md:149`
+
+For the remainder of this refactor (Tasks 2-16), the verification command `ailloy temper --assay .` will keep hitting those errors until one of the following is done. Pick the least-invasive option when it becomes a problem:
+
+1. Add a mold-level exclude for `docs/**` (if ailloy grows that knob — currently it does not, so file an upstream issue).
+2. Rename/move the plan and spec out of the mold tree (e.g., to a `.plans/` sibling that ailloy doesn't scan) — but they'd be harder to find.
+3. Sanitize the template-syntax code fences in the plan/spec (e.g., replace `{{` with Unicode look-alikes or escape with `{{"{{"}}`) — ugly but keeps docs inside the repo.
+4. Run the assay against a temporary checkout or against the live skills/commands only, e.g.: `ailloy assay .claude/` after rendering via `ailloy forge . -o <tmpdir> && ailloy assay <tmpdir>` — bypasses temper's mold-wide template pass.
+
+Until this is reconciled, all "verify the assay" checkpoints in Tasks 2-16 should run against a forge-then-assay flow rather than `ailloy temper --assay .` directly.
+
+---
+
 ## SKILL.md frontmatter convention (used throughout)
 
 Every `SKILL.md` created in this plan uses this frontmatter shape, per the [agentskills.io specification](https://agentskills.io/specification):
