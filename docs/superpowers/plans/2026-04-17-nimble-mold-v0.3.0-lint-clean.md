@@ -80,26 +80,30 @@ Clean baseline captured against `main` (pre-docs commits): **0 errors, 16 warnin
 
 - 10 × `commands-deprecated` — `brainstorm`, `create-issue`, `init-agents-md`, `open-pr`, `pr-comments`, `pr-description`, `pr-review`, `preflight`, `start-issue`, `update-pr`.
 - 4 × `line-count` — `brainstorm.md` 263, `create-issue.md` 297, `pr-comments.md` 334, `pr-review.md` 530 (threshold 150).
-- 1 × `empty-file` — `.github/copilot-instructions.md` (because the `{{- if has "copilot" .agent.targets -}}` wrapper renders empty under the default `agent.targets: [claude]`).
+- 1 × `empty-file` — `.github/copilot-instructions.md` (because the outer if-has-copilot wrapper renders empty under the default `agent.targets: [claude]`).
 - 1 × `duplicate-topics` — heading `"get current branch"` duplicated in `.claude/commands/pr-comments.md` and `.claude/commands/pr-review.md`.
 
 ailloy version confirmed: `v0.6.13-7-g3d2f29c` (matches the minimum required by this plan).
 
 ### Heads-up for later tasks (side finding, not blocking Task 1)
 
-`ailloy temper --assay .` on the current `ailloy-assay-refactor` branch fails with **2 template errors** (not warnings) because `temper` parses **every** `.md` file in the mold directory as a Go template, including the plan and spec markdown files under `docs/`. Both files embed Go-template syntax inside fenced code blocks (`{{- if has \"<target>\" .agent.targets -}}`), and the backslash-escaped quote breaks Go's template parser.
+`ailloy temper --assay .` on the current `ailloy-assay-refactor` branch fails with **2 template errors** (not warnings) because `temper` parses **every** `.md` file in the mold directory as a Go template, including the plan and spec markdown files under `docs/`. Both files embed Go-template syntax examples inside fenced code blocks — specifically, the plan embeds its own commit-message heredoc (search for "drop empty-render conditional" inside Task 2 Step 4) and the spec's Section 4 ("Empty `copilot-instructions.md`") quotes the wrapper syntax as part of its root-cause explanation. The backslash-escaped quotes inside those fenced examples break Go's template parser.
 
-- `docs/superpowers/plans/2026-04-17-nimble-mold-v0.3.0-lint-clean.md:120` (inside a ` ```bash ` code fence)
-- `docs/superpowers/specs/2026-04-17-nimble-mold-v0.3.0-lint-clean-design.md:149`
+This is a historical record of the root cause. The mitigation is captured in the amendment below; the earlier brainstorm of alternatives (mold-level excludes, moving docs out of tree, sanitizing fences) has been superseded and removed.
 
-For the remainder of this refactor (Tasks 2-16), the verification command `ailloy temper --assay .` will keep hitting those errors until one of the following is done. Pick the least-invasive option when it becomes a problem:
+### Amendment: verification command for Tasks 2-16
 
-1. Add a mold-level exclude for `docs/**` (if ailloy grows that knob — currently it does not, so file an upstream issue).
-2. Rename/move the plan and spec out of the mold tree (e.g., to a `.plans/` sibling that ailloy doesn't scan) — but they'd be harder to find.
-3. Sanitize the template-syntax code fences in the plan/spec (e.g., replace `{{` with Unicode look-alikes or escape with `{{"{{"}}`) — ugly but keeps docs inside the repo.
-4. Run the assay against a temporary checkout or against the live skills/commands only, e.g.: `ailloy assay .claude/` after rendering via `ailloy forge . -o <tmpdir> && ailloy assay <tmpdir>` — bypasses temper's mold-wide template pass.
+**Authoritative verification command for every "run the assay" / "verify the assay" checkpoint in Tasks 2 through 16:**
 
-Until this is reconciled, all "verify the assay" checkpoints in Tasks 2-16 should run against a forge-then-assay flow rather than `ailloy temper --assay .` directly.
+```bash
+rm -rf /tmp/nimble-mold-forge && ailloy forge . -o /tmp/nimble-mold-forge && ailloy assay /tmp/nimble-mold-forge
+```
+
+This replaces `ailloy temper --assay .` everywhere it appears as a verification step across Tasks 2-16. When a later task's Step text says `Run: ailloy temper --assay . ...`, treat it as shorthand for the forge-then-assay command above. Downstream subagents should use this literal command.
+
+**Why:** `temper` currently parses every `.md` in the mold tree as a Go template, which trips on the template-syntax examples embedded in `docs/superpowers/**/*.md` (the plan and spec files themselves). `forge -o <dir>` respects the mold's `output:` manifest and ignores `docs/`, so `assay` can run against the rendered blanks cleanly. Verified baseline under this flow is still **16 warnings** matching the original breakdown above (10 commands-deprecated, 4 line-count, 1 empty-file, 1 duplicate-topics).
+
+**Upstream follow-up (not blocking this plan):** `temper` should not parse files that live outside any `output:` path in the mold manifest. File this as a separate ailloy issue once the v0.3.0 refactor ships. It is **not** a prerequisite for completing Tasks 2-16.
 
 ---
 
