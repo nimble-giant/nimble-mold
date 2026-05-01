@@ -1,3 +1,7 @@
+---
+name: pr-description
+description: Generate a comprehensive PR description from the branch diff against main. Use when the user says "write the PR description", "draft the PR body", or asks for PR summary content.
+---
 # pr-description
 
 Generate a pull request description for the current branch changes.
