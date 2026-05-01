@@ -1,3 +1,7 @@
+---
+name: preflight
+description: Pre-flight planning ceremony that evaluates work against INVEST criteria, generates BDD acceptance specs, and sketches architecture before any code is written. Use when the user says "preflight", "plan this", or "let's scope this work".
+---
 # preflight
 
 Run pre-flight planning for a new task or mini-sprint.
