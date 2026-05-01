@@ -8,7 +8,7 @@
 
 [![ailloy >=0.6.16](https://img.shields.io/badge/ailloy-%3E%3D0.6.16-blue?style=flat-square)](https://github.com/nimble-giant/ailloy)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.3.0-orange?style=flat-square)](mold.yaml) <!-- x-release-please-version -->
+[![Version](https://img.shields.io/badge/version-0.4.0?style=flat-square)](mold.yaml) <!-- x-release-please-version -->
 
 </div>
 
