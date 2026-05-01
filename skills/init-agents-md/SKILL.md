@@ -1,3 +1,7 @@
+---
+name: init-agents-md
+description: Research the project and generate a holistic AGENTS.md file at the repo root. Use when the user says "init agents.md", "create AGENTS.md", or the project lacks agent instructions.
+---
 # Init AGENTS.md
 
 ## Purpose
