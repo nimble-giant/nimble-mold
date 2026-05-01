@@ -1,10 +1,12 @@
 apiVersion: v1
 kind: mold
 name: ailloy-defaults
-version: 0.3.0
-description: "Agent-agnostic AI development commands, skills, and workflows using the AGENTS.md standard"
+version: 0.4.0
+description: >-
+  Agent-agnostic AI development commands, skills, and workflows using the
+  AGENTS.md standard
 author:
   name: Nimble Giant
   url: https://github.com/nimble-giant/ailloy
 requires:
-  ailloy: ">=0.6.16"
+  ailloy: '>=0.6.16'
