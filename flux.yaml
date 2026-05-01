@@ -11,7 +11,6 @@ output:
   agents: .
   agent_config: .
   copilot_config: .github
-  commands: .claude/commands
   skills: .claude/skills
   workflows:
     dest: .github/workflows

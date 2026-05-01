@@ -1,3 +1,7 @@
+---
+name: open-pr
+description: Open a new pull request or update an existing one on the current branch. Use when the user says "open a PR", "push this up as a PR", or "create a pull request".
+---
 # open-pr
 
 Open a pull request for the current branch with automatically generated description, or update existing PR.

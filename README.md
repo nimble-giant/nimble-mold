@@ -6,9 +6,9 @@
 
 **Agent-agnostic instructions. Curated commands. Opinionated workflows.**
 
-[![ailloy >=0.2.0](https://img.shields.io/badge/ailloy-%3E%3D0.2.0-blue?style=flat-square)](https://github.com/nimble-giant/ailloy)
+[![ailloy >=0.6.16](https://img.shields.io/badge/ailloy-%3E%3D0.6.16-blue?style=flat-square)](https://github.com/nimble-giant/ailloy)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.2.0-orange?style=flat-square)](mold.yaml)
+[![Version](https://img.shields.io/badge/version-0.3.0-orange?style=flat-square)](mold.yaml)
 
 </div>
 
@@ -21,6 +21,15 @@
 The core methodology is **agent-agnostic**, using the [AGENTS.md standard](https://agents.md/) to provide universal instructions that work across AI coding agents — Claude Code, GitHub Copilot, OpenAI Codex, Aider, and others. Agent-specific configuration files are generated conditionally based on your targets.
 
 Think of it this way: ailloy is Helm, and nimble-mold is the official chart. Cast it into your project and get an instant, standardized AI-assisted development workflow — from brainstorming ideas to shipping pull requests.
+
+## Breaking changes in v0.3.0
+
+- `.claude/commands/` is no longer emitted. All former slash commands are now skills at `.claude/skills/<name>/SKILL.md` — invoke them with `/<name>` or let the agent trigger them autonomously.
+- Minimum `ailloy` version is now `>=0.6.16`.
+- Re-cast to migrate an existing project:
+  ```bash
+  ailloy cast github.com/nimble-giant/nimble-mold
+  ```
 
 ## Why nimble-mold?
 
@@ -65,7 +74,6 @@ This renders and installs:
 |----------|-------------|------|
 | `agents.md` | Project root | Always |
 | `CLAUDE.md` | Project root | `claude` in `agent.targets` (default) |
-| Commands | `.claude/commands/` | `claude` in `agent.targets` (default) |
 | Skills | `.claude/skills/` | `claude` in `agent.targets` (default) |
 | `copilot-instructions.md` | `.github/` | `copilot` in `agent.targets` |
 | Workflows | `.github/workflows/` | Always (Claude-specific) |
@@ -83,12 +91,12 @@ The `agents.md` file is the core of nimble-mold. It contains universal AI instru
 
 Agent-specific files (like `CLAUDE.md`) reference `agents.md` and add tool-specific configuration on top.
 
-## Commands
+## Skills
 
-Every command is a structured instruction that guides AI behavior through well-defined phases. No prompt engineering required — just invoke and go.
+Every skill is a structured instruction that guides AI behavior through well-defined phases. No prompt engineering required — invoke via slash command or let the agent trigger them autonomously.
 
-| Command | What it does |
-|---------|-------------|
+| Skill | What it does |
+|-------|-------------|
 | `/brainstorm <idea>` | 7-phase structured analysis of any idea. Freewriting, cubing, journalistic questions, feasibility assessment, hypothesis extraction, solution proposals, and a direct go/no-go verdict. Saves a report — never generates code. |
 | `/preflight` | Pre-flight planning ceremony. Evaluates work against INVEST criteria, generates BDD acceptance specs (Given/When/Then), sketches architecture, and presents a go/no-go decision before any code is written. |
 | `/start-issue <number>` | Fetches a GitHub issue and begins focused implementation. Builds a task list from requirements and stays scoped to that single issue. |
@@ -99,16 +107,6 @@ Every command is a structured instruction that guides AI behavior through well-d
 | `/pr-review` | Conducts a full code review. Silent mode (default) outputs a markdown report. Interactive mode posts inline comments to the PR after plan approval. Supports focused reviews: security, performance, testing, or architecture. |
 | `/pr-comments` | Fetches all PR review comments, plans strategic responses, makes code changes, and posts replies — all in one pass. |
 | `/init-agents-md` | Researches your project and generates a holistic `AGENTS.md` file. Sources from existing `CLAUDE.md` if present, links to sub-files if content exceeds 150 lines, and optionally replaces `CLAUDE.md` with a `@AGENTS.md` reference. |
-
-## Skills
-
-Skills are auto-triggered capabilities that activate based on natural language context.
-
-| Skill | Triggers on |
-|-------|------------|
-| **Brainstorm** | "brainstorm X", "is this idea worth building?", "help me think through this", "evaluate this concept" |
-
-Skills run the same structured methodology as their command counterparts but activate conversationally — no slash prefix needed.
 
 ## Workflows
 
@@ -168,19 +166,31 @@ nimble-mold/
 │   └── CLAUDE.md                  #   Conditional: "claude" in agent.targets
 ├── copilot_config/                # Copilot-specific config
 │   └── copilot-instructions.md    #   Conditional: "copilot" in agent.targets
-├── commands/                      # AI agent commands
-│   ├── brainstorm.md
-│   ├── create-issue.md
-│   ├── init-agents-md.md
-│   ├── open-pr.md
-│   ├── pr-comments.md
-│   ├── pr-description.md
-│   ├── pr-review.md
-│   ├── preflight.md
-│   ├── start-issue.md
-│   └── update-pr.md
-├── skills/                        # Auto-triggered skills
-│   └── brainstorm.md
+├── skills/                        # AI agent skills (slash commands + autonomous)
+│   ├── brainstorm/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── create-issue/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── init-agents-md/
+│   │   └── SKILL.md
+│   ├── open-pr/
+│   │   └── SKILL.md
+│   ├── pr-comments/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── pr-description/
+│   │   └── SKILL.md
+│   ├── pr-review/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── preflight/
+│   │   └── SKILL.md
+│   ├── start-issue/
+│   │   └── SKILL.md
+│   └── update-pr/
+│       └── SKILL.md
 ├── workflows/                     # GitHub Actions (Claude-specific)
 │   ├── claude-code.yml
 │   └── claude-code-review.yml
@@ -199,7 +209,7 @@ nimble-mold/
 
 | Dependency | Version |
 |------------|---------|
-| [ailloy](https://github.com/nimble-giant/ailloy) | >= 0.2.0 |
+| [ailloy](https://github.com/nimble-giant/ailloy) | >= 0.6.16 |
 | [GitHub CLI](https://cli.github.com/) | Latest (authenticated) |
 
 **Optional** (based on agent targets):

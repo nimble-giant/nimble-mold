@@ -1,3 +1,7 @@
+---
+name: update-pr
+description: Regenerate the PR description for the current branch from scratch. Use when the user says "update the PR", "refresh the PR body", or "regenerate PR description".
+---
 # update-pr
 
 Update the description of an existing pull request for the current branch.

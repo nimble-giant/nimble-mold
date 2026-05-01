@@ -1,3 +1,7 @@
+---
+name: start-issue
+description: Fetch a GitHub issue by number and begin focused implementation scoped to that issue. Use when the user says "start issue 42", "work on #42", or provides an issue URL.
+---
 # Start Issue
 
 Fetch a {{scm.provider}} issue and begin implementation.
